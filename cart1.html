@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tech Shop Erode</title>
+    <style>
+        body { font-family: sans-serif; display: flex; margin: 0; background: #f0f2f5; }
+
+        .products-section { flex: 1.5; padding: 25px; }
+
+        .cart-sidebar { 
+            flex: 1; background: white; border-left: 2px solid #ddd; 
+            padding: 20px; height: 100vh; position: sticky; top: 0;
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .card { background: white; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
+        
+        
+        .cart-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+
+       
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 8px; font-weight: bold; }
+        .add-btn { background: #2563eb; color: white; width: 100%; margin-top: 10px; }
+        .remove-btn { background: #ff4d4d; color: white; padding: 2px 8px; }
+        .pay-btn { background: #059669; color: white; width: 100%; padding: 15px; font-size: 1.1rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="products-section">
+        <h1>Tech Shop, Erode</h1>
+        <div class="grid" id="product-list"></div>
+    </div>
+
+    <div class="cart-sidebar">
+        <h2 style="background: #2563eb; color: white; padding: 10px; margin: -20px -20px 20px -20px; text-align: center;">Items in Cart</h2>
+        <div id="cart-content">
+            <p style="color: gray; text-align: center;">Cart is empty</p>
+        </div>
+        <div style="margin-top: 50px; border-top: 2px solid #2563eb; padding-top: 10px;">
+            <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold;">
+                <span>Total:</span>
+                <span>₹<span id="total">0</span></span>
+            </div>
+            <button class="pay-btn" onclick="checkout()">Proceed to Pay</button>
+        </div>
+    </div>
+
+<script>
+    
+    const products = [
+        { id: 1, name: "Wireless Headphones", price: 2499 },
+        { id: 2, name: "Fitness Tracker", price: 1800 },
+        { id: 3, name: "Gaming Mouse", price: 950 },
+        { id: 4, name: "Mechanical Keyboard", price: 3200 },
+        { id: 5, name: "512GB Pen Drive", price: 1550 },
+        { id: 6, name: "HD Webcam", price: 2800 },
+        { id: 7, name: "Curved Monitor", price: 14500 },
+        { id: 8, name: "Bluetooth Speaker", price: 1200 }
+    ];
+
+    let cart = []; 
+
+    
+    document.getElementById('product-list').innerHTML = products.map(p => `
+        <div class="card">
+            <h4>${p.name}</h4>
+            <p>₹${p.price}</p>
+            <button class="add-btn" onclick="addToCart(${p.id})">ADD TO CART</button>
+        </div>
+    `).join('');
+
+    function addToCart(id) {
+        const item = products.find(p => p.id === id); 
+        cart.push(item); 
+        updateUI();
+    }
+
+    function remove(index) {
+        cart.splice(index, 1); 
+        updateUI();
+    }
+
+    function updateUI() {
+        const content = document.getElementById('cart-content');
+        const totalDisp = document.getElementById('total');
+
+        if(cart.length === 0) { 
+            content.innerHTML = "<p style='text-align:center; color:gray;'>Cart is empty</p>";
+        } else {
+            content.innerHTML = cart.map((item, index) => `
+                <div class="cart-row">
+                    <span>${item.name}</span>
+                    <div>
+                        <span>₹${item.price}</span>
+                        <button class="remove-btn" onclick="remove(${index})">x</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        const totalValue = cart.reduce((sum, item) => sum + item.price, 0);
+        totalDisp.innerText = totalValue.toLocaleString('en-IN');
+    }
+
+    function checkout() {
+        if(cart.length === 0) return alert("Cart is empty!");
+        alert("Payment Successful for ₹" + document.getElementById('total').innerText);
+        cart = []; 
+        updateUI();
+    }
+</script>
+
+</body>
+</html>
