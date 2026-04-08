@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Registration Portal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;  
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+            font-size: 14px;
+        }
+
+        input[readonly] {
+            background-color: #f0f0f0; 
+            color: #555;
+            cursor: not-allowed;
+            border-color: #ddd;
+        }
+
+        
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        .gender-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+        .gender-option {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .gender-option input {
+            margin-right: 5px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #0056b3;
+            color: white;
+            padding: 14px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #004494;
+        }
+
+        #msg {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .error { background-color: #ffe6e6; color: #d8000c; border: 1px solid #d8000c; }
+        .success { background-color: #dff0d8; color: #3c763d; border: 1px solid #3c763d; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="text-align: center;">
+        <h2>Voter Registration</h2>
+    </div>
+
+    <form id="voteForm" onsubmit="return validateData()">
+
+        <label>Full Name:</label>
+        <input type="text" id="name" placeholder="ex: John Doe" required>
+
+        <label>Date of Birth:</label>
+        <input type="date" id="dob" required onchange="calculateAge()">
+
+        <label>Calculated Age:</label>
+        <input type="text" id="age" placeholder="Select DOB above" readonly>
+
+        <label>Gender:</label>
+        <div class="gender-group">
+            <label class="gender-option"><input type="radio" name="gender" value="Male" required> Male</label>
+            <label class="gender-option"><input type="radio" name="gender" value="Female"> Female</label>
+            <label class="gender-option"><input type="radio" name="gender" value="Other"> Other</label>
+        </div>
+
+        <label>Email Address:</label>
+        <input type="email" id="email" placeholder="prabu@example.com" required>
+
+        <label>Phone Number:</label>
+        <input type="tel" id="phone" placeholder="9876543210" maxlength="10" required>
+
+        <label>Voter ID Card Number:</label>
+        <input type="text" id="voterId" placeholder="ABC12345" maxlength="8" 
+               oninput="this.value = this.value.toUpperCase()" required>
+
+        <label>Permanent Address:</label>
+        <textarea id="address" placeholder="Enter your full address here..." required></textarea>
+
+        <div id="msg"></div>
+
+        <input type="submit" value="Register Now">
+
+    </form>
+</div>
+
+<script>
+
+function calculateAge() {
+    let dobInput = document.getElementById("dob").value;
+    let ageInput = document.getElementById("age");
+
+   
+    if(!dobInput) {
+        ageInput.value = "";
+        return;
+    }
+
+    let dobDate = new Date(dobInput);
+    let today = new Date();
+
+   
+    let age = today.getFullYear() - dobDate.getFullYear();
+    let monthDiff = today.getMonth() - dobDate.getMonth();
+
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+        age--;
+    }
+
+    ageInput.value = age;
+}
+
+function validateData() {
+    let age = document.getElementById("age").value;
+    let voterId = document.getElementById("voterId").value.trim();
+    let phone = document.getElementById("phone").value;
+    let msg = document.getElementById("msg");
+    
+    msg.style.display = "none";
+    msg.className = "";
+
+
+    if (age === "") {
+        showError("Please select your Date of Birth.");
+        return false;
+    }
+
+    if (parseInt(age) < 18) {
+        showError("You are " + age + " years old. You must be 18+ to vote.");
+        return false;
+    }
+    
+
+    if (phone.length !== 10 || isNaN(phone)) {
+        showError("Please enter a valid 10-digit phone number.");
+        return false;
+    }
+
+ 
+    let idPattern = /^[A-Z]{3}[0-9]{5}$/;
+    if (!idPattern.test(voterId)) {
+        showError("Invalid Voter ID. Must be 3 letters + 5 numbers.");
+        return false;
+    } 
+
+    msg.innerHTML = "Registration Successful!";
+    msg.className = "success";
+    msg.style.display = "block";
+    
+    setTimeout(function(){
+        document.getElementById("voteForm").reset();
+        msg.style.display = "none";
+    }, 10000);
+
+    return false;
+}
+
+function showError(message) {
+    let msg = document.getElementById("msg");
+    msg.innerHTML = message;
+    msg.className = "error";
+    msg.style.display = "block";
+}
+</script>
+
+</body>
+</html>
